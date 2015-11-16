@@ -10,6 +10,7 @@ import org.codehaus.groovy.ast.AnnotatedNode;
 import org.codehaus.groovy.ast.AnnotationNode;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.FieldNode;
+import org.codehaus.groovy.ast.PropertyNode;
 import org.codehaus.groovy.ast.expr.ConstantExpression;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.transform.GroovyASTTransformation;
@@ -48,7 +49,9 @@ public class GjtVersionAstTransformation extends AbstractGjtAstTransformation<Gj
             return;
         }
         
-        versionField = entityClass.addField(VERSION_FIELD_NAME, ACC_PRIVATE, make(Long.class), new ConstantExpression(null));
+        PropertyNode versionProperty = entityClass.addProperty(VERSION_FIELD_NAME, ACC_PUBLIC, make(Long.class), new ConstantExpression(null), null, null);
+        versionField = versionProperty.getField();
+        versionField.setModifiers(ACC_PRIVATE);
         versionField.addAnnotation(new AnnotationNode(make(Version.class)));
     }
 }
