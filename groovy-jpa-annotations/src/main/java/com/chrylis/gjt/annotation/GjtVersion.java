@@ -16,4 +16,8 @@ import org.codehaus.groovy.transform.GroovyASTTransformationClass;
 @Retention(RetentionPolicy.SOURCE)
 @GroovyASTTransformationClass("com.chrylis.gjt.transform.GjtVersionAstTransformation")
 public @interface GjtVersion {
+    
+    Class<?> type() default Long.class;
+    
+    String name() default "version";
 }
