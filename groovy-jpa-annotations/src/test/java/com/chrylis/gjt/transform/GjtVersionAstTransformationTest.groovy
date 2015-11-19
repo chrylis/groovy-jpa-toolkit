@@ -7,6 +7,9 @@ import java.time.Instant
 
 import javax.persistence.Version
 
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.codehaus.groovy.control.messages.Message
+
 import spock.lang.Specification
 
 import com.chrylis.gjt.annotation.GjtVersion
@@ -40,16 +43,16 @@ class GjtVersionAstTransformationTest extends Specification {
     }
     
     @CompileStatic
-    Class makeVersionedClass(Class type, String name) {
+    Class makeVersionedClass(Class type, String name, String body = '') {
         new GroovyClassLoader().parseClass("""
             @groovy.transform.CompileStatic
             @com.chrylis.gjt.annotation.GjtVersion(type=$type.name, name="$name")
-            class Temp {}""")
+            class Temp { $body }""")
     }
     
     def 'parameters are applied correctly'(Class type, String fieldName) {
         given:
-            Field field = makeVersionedClass(type, fieldName).getDeclaredField(fieldName)
+            Field field = makeVersionedClass(type, fieldName, 'Short version').getDeclaredField(fieldName)
         
         expect:
             type == field.type
@@ -60,5 +63,29 @@ class GjtVersionAstTransformationTest extends Specification {
             int     | 'foobar'
             Long    | 'helloWorld'
             Instant | 'asdf'
+    }
+    
+    def 'conflicting field names produce an error'() {
+        when:
+            makeVersionedClass(Long, 'version', 'Long version')
+            
+        then:
+            MultipleCompilationErrorsException ex = thrown()
+            ex.message.contains('@GjtVersion')
+            ex.message.contains('already exists')
+            
+            1 == ex.errorCollector.errorCount
+    }
+    
+    def 'conflicting annotation produces an error'() {
+        when:
+            makeVersionedClass(Long, 'version', '@javax.persistence.Version Integer foo')
+            
+        then:
+            MultipleCompilationErrorsException ex = thrown()
+            ex.message.contains('@GjtVersion')
+            ex.message.contains('existing @Version')
+            
+            1 == ex.errorCollector.errorCount
     }
 }
