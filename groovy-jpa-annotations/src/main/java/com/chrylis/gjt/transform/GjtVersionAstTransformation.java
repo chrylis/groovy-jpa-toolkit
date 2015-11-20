@@ -16,11 +16,6 @@ public class GjtVersionAstTransformation extends AbstractGjtPropertyAddingAstTra
     }
 
     @Override
-    public boolean canApplyToClassOnly() {
-        return true;
-    }
-    
-    @Override
     protected Class<?> identifyingAnnotation() {
         return Version.class;
     }

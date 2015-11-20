@@ -21,6 +21,14 @@ import org.codehaus.groovy.ast.expr.Expression;
 public abstract class AbstractGjtPropertyAddingAstTransformation<T extends Annotation> extends AbstractGjtAstTransformation<T> {
 
     /**
+     * These transformations add properties to the class in question; it doesn't make sense to apply elsewhere.
+     */
+    @Override
+    public boolean canApplyToClassOnly() {
+        return true;
+    }
+    
+    /**
      * @return the annotation, such as {@code @Version} or {@code @Id},
      *         that identifies the property this transformation manages
      */

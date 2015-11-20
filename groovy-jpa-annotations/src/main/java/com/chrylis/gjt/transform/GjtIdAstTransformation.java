@@ -16,11 +16,6 @@ public class GjtIdAstTransformation extends AbstractGjtPropertyAddingAstTransfor
     }
 
     @Override
-    public boolean canApplyToClassOnly() {
-        return true;
-    }
-    
-    @Override
     protected Class<?> identifyingAnnotation() {
         return Id.class;
     }
