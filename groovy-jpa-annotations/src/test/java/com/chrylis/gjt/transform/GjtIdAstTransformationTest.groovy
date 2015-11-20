@@ -5,13 +5,17 @@ import groovy.transform.CompileStatic
 import java.lang.reflect.Field
 import java.time.Instant
 
+import javax.persistence.Column
 import javax.persistence.Id
+import javax.persistence.OneToOne
 
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 import spock.lang.Specification
 
 import com.chrylis.gjt.annotation.GjtId
+import com.chrylis.gjt.transform.annotationcollectors.AddColumnName
+import com.chrylis.gjt.transform.annotationcollectors.AddOneToOne
 
 class GjtIdAstTransformationTest extends Specification {
 
@@ -86,5 +90,45 @@ class GjtIdAstTransformationTest extends Specification {
             ex.message.contains('existing @Id')
             
             1 == ex.errorCollector.errorCount
+    }
+    
+    @CompileStatic
+    Class makeClassWithAnnotationCollectors(List<Class> annotationCollectors) {
+        String parameter
+        
+        if(annotationCollectors.empty) {
+            parameter = ''
+        } else if(annotationCollectors.size() == 1) {
+            parameter = 'annotationCollectors = ' + annotationCollectors[0].name
+        } else {
+            parameter = 'annotationCollectors = [' +
+                annotationCollectors.collect { it.name }.join(',') + ']'
+        }
+        
+        new GroovyClassLoader().parseClass("""
+            @groovy.transform.CompileStatic
+            @com.chrylis.gjt.annotation.GjtId($parameter)
+            class Temp {}""")
+    }
+    
+    def 'annotation collector correctly copies annotations'(List<Class> parameters, int numAnnotations) {
+        given:
+            Field field = makeClassWithAnnotationCollectors(parameters).getDeclaredField('id')
+            
+        expect:
+            Long == field.type
+            field.getAnnotation(Id)
+            numAnnotations == field.annotations.length
+            
+        if(field.annotations.length == 3) {
+            assert field.getAnnotation(Column).name() == 'foobar'
+            assert field.getAnnotation(OneToOne).mappedBy() == 'asdf'
+        }
+            
+        where:
+            parameters                   || numAnnotations
+            []                           || 1
+            [AddOneToOne]                || 2
+            [AddOneToOne, AddColumnName] || 3
     }
 }

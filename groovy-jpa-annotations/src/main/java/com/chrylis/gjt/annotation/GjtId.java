@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass;
 
+import groovy.lang.GroovyObject;
+
 /**
  * Adds a JPA {@code @Version} property to the annotated type.
  * 
@@ -20,4 +22,6 @@ public @interface GjtId {
     Class<?> type() default Long.class;
     
     String name() default "id";
+    
+    Class<? extends GroovyObject>[] annotationCollectors() default {};
 }
