@@ -99,4 +99,14 @@ public final class GjtUtils {
             .map(ClassExpression::getType)
             .collect(Collectors.toList());
     }
+    
+    public static String setterName(String fieldName) {
+        StringBuilder name = new StringBuilder("set").append(fieldName);
+        name.setCharAt(3, Character.toUpperCase(name.charAt(3)));
+        return name.toString();
+    }
+    
+    public static String setterName(FieldNode field) {
+        return setterName(field.getName());
+    }
 }

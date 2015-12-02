@@ -185,7 +185,7 @@ public abstract class AbstractGjtPropertyAddingAstTransformation<T extends Annot
      *            the type of the property
      * @param name
      *            the name of the property
-     * @param modifers
+     * @param modifiers
      *            the access modifiers for the property, such as {@code ACC_PUBLIC}
      * @param initialValue
      *            the value to be assigned on initialization

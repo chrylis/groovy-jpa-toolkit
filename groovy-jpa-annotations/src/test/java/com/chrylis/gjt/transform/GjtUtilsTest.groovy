@@ -46,4 +46,17 @@ class GjtUtilsTest extends Specification {
         then:
             fieldName == GjtUtils.getAnnotationMemberStringValue(node, 'name')
     }
+    
+    def 'can generate setter name'(String fieldName, String setterName) {
+        expect:
+            setterName == GjtUtils.setterName(fieldName)
+
+        where:
+            fieldName || setterName
+            "foo"     || "setFoo"
+            "Bar"     || "setBar"
+            "URL"     || "setURL"
+            "_asdf"   || "set_asdf"
+            "_Jay"    || "set_Jay"
+    }
 }
